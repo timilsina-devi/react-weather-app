@@ -5,7 +5,7 @@ import "./App.css";
 
 const api = {
   key: "83be13f418ef4eb37391d8f24362b55c",
-  base: "http://api.openweathermap.org/data/2.5/",
+  base: "https://api.openweathermap.org/data/2.5/",
 };
 const App = () => {
   const [lat, setLat] = useState(0);
