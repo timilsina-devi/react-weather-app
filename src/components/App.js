@@ -37,9 +37,12 @@ const App = () => {
     setTLocation(loc);
   };
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setCity(tLocation);
-    setLat(0);
+    if (e.key === "Enter" || e.type === "click") {
+      e.preventDefault();
+      setCity(tLocation);
+      setLat(0);
+      document.getElementById("city").value = "";
+    }
   };
 
   return (
@@ -55,7 +58,7 @@ const App = () => {
             autoComplete="off"
             className="form-control"
             onChange={(e) => handleChange(e.target.value)}
-            // onKeyPress={changeCity}
+            onKeyPress={handleSubmit}
           />
         </div>
         <div className="col-lg-r ml-3">

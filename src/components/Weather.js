@@ -13,8 +13,8 @@ const Weather = ({ fetchURL }) => {
   const [feelsLike, setFeelsLike] = useState(0);
   const [wind, setWind] = useState(0);
   const [humidity, setHumidity] = useState(0);
-  // const [sunrise, setSunrise] = useState("");
-  // const [sunset, setSunset] = useState("");
+  const [sunrise, setSunrise] = useState("");
+  const [sunset, setSunset] = useState("");
   const [description, setDescription] = useState("");
   const [weatherIcon, setWeatherIcon] = useState("");
 
@@ -37,10 +37,10 @@ const Weather = ({ fetchURL }) => {
         setCityName(result.name);
         setWeatherIcon(result.weather[0].icon + ".png");
 
-        // let unixSunrise = result.sys.sunrise;
-        // let unixSunset = result.sys.sunset;
-        // setSunrise(moment.unix(unixSunrise).format("hh:mm A"));
-        // setSunset(moment.unix(unixSunset).format("hh:mm A"));
+        let unixSunrise = result.sys.sunrise;
+        let unixSunset = result.sys.sunset;
+        setSunrise(moment.unix(unixSunrise).format("hh:mm A"));
+        setSunset(moment.unix(unixSunset).format("hh:mm A"));
       } catch (error) {
         console.log(error);
       }
@@ -90,12 +90,12 @@ const Weather = ({ fetchURL }) => {
           <div className="col-lg-12">
             <h6>Wind : {Math.round(wind * kmPerHr)} KM/H</h6>
           </div>
-          {/* <div className="col-lg-12">
+          <div className="col-lg-12">
             <h6>Sunrise : {sunrise}</h6>
           </div>
           <div className="col-lg-12">
             <h6>Sunset : {sunset}</h6>
-          </div> */}
+          </div>
         </div>
       </div>
     </>
