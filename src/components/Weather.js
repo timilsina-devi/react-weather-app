@@ -17,6 +17,7 @@ const Weather = ({ fetchURL }) => {
   const [sunset, setSunset] = useState("");
   const [description, setDescription] = useState("");
   const [weatherIcon, setWeatherIcon] = useState("");
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     async function search() {
@@ -24,23 +25,29 @@ const Weather = ({ fetchURL }) => {
         const response = await fetch(fetchURL);
         const result = await response.json();
 
-        setData({
-          country: result.sys.country,
-          temp_min: result.main.temp_min,
-          temp_max: result.main.temp_max,
-        });
-        setTemp(Math.ceil(result.main.temp - kelvinFactor));
-        setFeelsLike(Math.ceil(result.main.feels_like - kelvinFactor));
-        setWind(result.wind.speed);
-        setDescription(result.weather[0].description);
-        setHumidity(result.main.humidity);
-        setCityName(result.name);
-        setWeatherIcon(result.weather[0].icon + ".png");
+        if (response.status === 404) {
+          setIsError(true);
+          throw new Error("City Not Found");
+        } else {
+          setIsError(false);
+          setData({
+            country: result.sys.country,
+            temp_min: result.main.temp_min,
+            temp_max: result.main.temp_max,
+          });
+          setTemp(Math.ceil(result.main.temp - kelvinFactor));
+          setFeelsLike(Math.ceil(result.main.feels_like - kelvinFactor));
+          setWind(result.wind.speed);
+          setDescription(result.weather[0].description);
+          setHumidity(result.main.humidity);
+          setCityName(result.name);
+          setWeatherIcon(result.weather[0].icon + ".png");
 
-        let unixSunrise = result.sys.sunrise;
-        let unixSunset = result.sys.sunset;
-        setSunrise(moment.unix(unixSunrise).format("hh:mm A"));
-        setSunset(moment.unix(unixSunset).format("hh:mm A"));
+          let unixSunrise = result.sys.sunrise;
+          let unixSunset = result.sys.sunset;
+          setSunrise(moment.unix(unixSunrise).format("hh:mm A"));
+          setSunset(moment.unix(unixSunset).format("hh:mm A"));
+        }
       } catch (error) {
         console.log(error);
       }
@@ -51,52 +58,62 @@ const Weather = ({ fetchURL }) => {
   return (
     <>
       <div className="row m-3">
-        <div
-          className="col-lg-6 m-1"
-          style={{ backgroundColor: "whitesmoke", padding: "20px" }}
-        >
-          <div className="col-lg-12">
-            <h3 className="text-info">
-              <span>{cityName}</span>
-              <span>,{data.country}</span>
-            </h3>
+        {isError ? (
+          <div
+            className="col-lg-6 m-1"
+            style={{ backgroundColor: "whitesmoke", width: "100%" }}
+          >
+            <h1 style={{ color: "orange", textAlign: "center" }}>404</h1>
+            <p style={{ color: "red", textAlign: "center" }}>City Not Found</p>
           </div>
-          <div className="col-lg-12">
-            <h4 style={{ textTransform: "capitalize" }}>{description}</h4>
+        ) : (
+          <div
+            className="col-lg-6 m-1"
+            style={{ backgroundColor: "whitesmoke", padding: "20px" }}
+          >
+            <div className="col-lg-12">
+              <h3 className="text-info">
+                <span>{cityName}</span>
+                <span>,{data.country}</span>
+              </h3>
+            </div>
+            <div className="col-lg-12">
+              <h4 style={{ textTransform: "capitalize" }}>{description}</h4>
+            </div>
+            <div className="col-lg-12">
+              <h2 className="text-success">
+                <span className="p-1" style={{ borderRadius: "10px" }}>
+                  <img
+                    src={"https://openweathermap.org/img/w/" + weatherIcon}
+                    alt="weather-icon"
+                  />
+                  {temp}&nbsp;&deg;C
+                </span>
+              </h2>
+            </div>
+            <div className="col-lg-12">
+              <h6>
+                {Math.ceil(data.temp_max - kelvinFactor)}&deg;C /{" "}
+                {Math.ceil(data.temp_min - kelvinFactor)}&deg;C
+              </h6>
+            </div>
+            <div className="col-lg-12">
+              <h6>Feels Like : {feelsLike}&nbsp;&deg;C</h6>
+            </div>
+            <div className="col-lg-12">
+              <h6>Humidity : {humidity}%</h6>
+            </div>
+            <div className="col-lg-12">
+              <h6>Wind : {Math.round(wind * kmPerHr)} KM/H</h6>
+            </div>
+            <div className="col-lg-12">
+              <h6>Sunrise : {sunrise}</h6>
+            </div>
+            <div className="col-lg-12">
+              <h6>Sunset : {sunset}</h6>
+            </div>
           </div>
-          <div className="col-lg-12">
-            <h2 className="text-success">
-              <span className="p-1" style={{ borderRadius: "10px" }}>
-                <img
-                  src={"https://openweathermap.org/img/w/" + weatherIcon}
-                  alt="weather-icon"
-                />
-                {temp}&nbsp;&deg;C
-              </span>
-            </h2>
-          </div>
-          <div className="col-lg-12">
-            <h6>
-              {Math.ceil(data.temp_max - kelvinFactor)}&deg;C /{" "}
-              {Math.ceil(data.temp_min - kelvinFactor)}&deg;C
-            </h6>
-          </div>
-          <div className="col-lg-12">
-            <h6>Feels Like : {feelsLike}&nbsp;&deg;C</h6>
-          </div>
-          <div className="col-lg-12">
-            <h6>Humidity : {humidity}%</h6>
-          </div>
-          <div className="col-lg-12">
-            <h6>Wind : {Math.round(wind * kmPerHr)} KM/H</h6>
-          </div>
-          <div className="col-lg-12">
-            <h6>Sunrise : {sunrise}</h6>
-          </div>
-          <div className="col-lg-12">
-            <h6>Sunset : {sunset}</h6>
-          </div>
-        </div>
+        )}
       </div>
     </>
   );
