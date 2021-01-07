@@ -27,7 +27,7 @@ const App = () => {
     userLocation();
   }, []);
   let completeURL;
-  if (lat > 0) {
+  if (lat) {
     completeURL = `${api.base}weather?lat=${lat}&lon=${lon}&appid=${api.key}`;
   } else {
     completeURL = `${api.base}weather?q=${city}&appid=${api.key}`;
